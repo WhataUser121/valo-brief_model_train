@@ -1,0 +1,175 @@
+%%{init: { 
+  'theme': 'base',
+  'themeVariables': { 
+    'fontFamily': 'Malgun Gothic, Apple SD Gothic Neo, sans-serif',
+    'fontSize': '52px',
+    'entityPadding': '45px',
+    
+    'entityBackground': '#FFFFFF',
+    'entityBorder': '#000000',
+    'attributeBackgroundColor': '#F8FAFC',
+    
+    'mainBkg': '#FFFFFF',
+    'nodeBorder': '#000000',
+    'borderWidth': '4px',
+    
+    'lineColor': '#000000',
+    'strokeWidth': '5px',
+    
+    'tertiaryColor': '#F1F5F9',
+    'edgeLabelBackground': '#000000',
+    'LABELCOLOR': '#FFFFFF'
+  }
+}}%%
+erDiagram
+
+    TEAMS ||--o{ TEAM_MEMBERS : "로스터"
+    RIOT_ACCOUNTS ||--o{ TEAM_MEMBERS : "연결"
+    TEAMS ||--o{ MATCHES : "team_a"
+    TEAMS ||--o{ MATCHES : "team_b"
+    MATCHES ||--o{ MATCH_PLAYER_STATS : "구성"
+    RIOT_ACCOUNTS ||--o{ MATCH_PLAYER_STATS : "기록"
+    RIOT_ACCOUNTS ||--o{ PLAYER_STATS_SUMMARY : "집계"
+    RIOT_ACCOUNTS ||--o{ RANK_SNAPSHOTS : "개인랭크"
+    TEAMS ||--o{ TEAM_STATS_SUMMARY : "집계"
+    TEAMS ||--o{ RANK_SNAPSHOTS : "팀랭크"
+    TEAMS ||--o{ PREDICTIONS : "team_a"
+    TEAMS ||--o{ PREDICTIONS : "team_b"
+    TEAMS ||--o{ INSIGHTS : "팀리포트"
+    RIOT_ACCOUNTS ||--o{ INSIGHTS : "개인피드백"
+    PREMIER_TIERS ||--o{ TEAMS : "기준"
+
+    TEAMS {
+        bigint team_id PK
+        varchar email
+        varchar login_id
+        varchar password_hash
+        boolean privacy_agreed
+        varchar team_name
+        varchar team_tag
+        varchar premier_team_id
+        varchar season
+        varchar conference
+        varchar division
+        int ranking_points
+        datetime created_at
+    }
+
+    RIOT_ACCOUNTS {
+        varchar puuid PK
+        varchar riot_name
+        varchar riot_tag
+        varchar region
+        varchar platform
+        varchar current_rank
+        int current_rr
+        enum verification_status
+        datetime verified_at
+        datetime updated_at
+    }
+
+    TEAM_MEMBERS {
+        bigint team_member_id PK
+        bigint team_id FK
+        varchar puuid FK
+        boolean is_representative
+        boolean is_starter
+        varchar role_type_override
+        datetime joined_at
+    }
+
+    MATCHES {
+        varchar match_id PK
+        varchar map_name
+        varchar mode
+        datetime game_start
+        bigint team_a_id FK
+        bigint team_b_id FK
+        bigint winner_team_id
+        json round_detail_json
+        varchar api_source
+        datetime collected_at
+    }
+
+    MATCH_PLAYER_STATS {
+        bigint stat_id PK
+        varchar match_id FK
+        varchar puuid FK
+        bigint team_id FK
+        varchar agent
+        varchar role_type
+        varchar side
+        int acs
+        int kills
+        int deaths
+        int assists
+        float headshot_pct
+        float kast
+        int adr
+        int first_bloods
+        int first_deaths
+        varchar most_used_weapon
+        json detail_json
+    }
+
+    TEAM_STATS_SUMMARY {
+        bigint summary_id PK
+        bigint team_id FK
+        enum stat_type
+        varchar dimension_key
+        int wins
+        int losses
+        json metrics_json
+        datetime updated_at
+    }
+
+    PLAYER_STATS_SUMMARY {
+        bigint summary_id PK
+        varchar puuid FK
+        enum stat_type
+        varchar dimension_key
+        json metrics_json
+        datetime updated_at
+    }
+
+    PREDICTIONS {
+        bigint prediction_id PK
+        bigint team_a_id FK
+        bigint team_b_id FK
+        varchar map_name
+        float predicted_winrate_a
+        float predicted_winrate_b
+        varchar model_version
+        json feature_snapshot_json
+        varchar actual_result
+        datetime created_at
+    }
+
+    INSIGHTS {
+        bigint insight_id PK
+        bigint team_id FK
+        bigint opponent_team_id
+        enum target_type
+        varchar target_puuid
+        varchar insight_type
+        text content
+        datetime generated_at
+    }
+
+    RANK_SNAPSHOTS {
+        bigint snapshot_id PK
+        enum owner_type
+        varchar owner_id
+        varchar tier_or_division
+        int points
+        datetime snapshot_at
+    }
+
+    PREMIER_TIERS {
+        int tier_id PK
+        varchar name_kr
+        varchar name_en
+        varchar sub_division_range
+        int tier_order
+        varchar image_path
+    }

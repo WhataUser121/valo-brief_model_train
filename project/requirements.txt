@@ -1,0 +1,16 @@
+fastapi
+uvicorn 
+sqlalchemy
+pymysql
+pydantic
+pandas
+dotenv
+passlib
+bcrypt == 4.3.0 # 4.0 버전에서만 passlib 와 정상 구동 가능. 최신 버전인 5.0 버전은 아직 호환 불가
+python-jose
+openai
+dotenv
+scikit-learn
+joblib
+xgboost
+shap
